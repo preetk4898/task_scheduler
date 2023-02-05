@@ -19,7 +19,7 @@ import time
 class TaskRunner:
     def __init__(self, adj_list, root):
         '''
-        Insert comments here
+        Initialize objects that will be ubiqutious throughout the program.
         '''
         self.adj_list = adj_list
         self.num_vertices = len(adj_list.keys())

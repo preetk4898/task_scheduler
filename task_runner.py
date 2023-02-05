@@ -3,6 +3,8 @@ Preet Kaur
 
 Task Runner 
 Bighat Biosciences Take-Home Assignment
+Pseudocode: 
+https://docs.google.com/document/d/1I88jOjG27xrhnC2wE7hiqMaAuDfoqB4tS8WPLgrdMV4/edit?usp=sharing
 
 How to run: 
 
@@ -29,9 +31,10 @@ class TaskRunner:
         with the nodes and the order and time in which they will be printed. I would consider this pre-processing.
         '''
         num_incoming_vert = defaultdict(int) #create a dictionary to track the number of dependencies of each task 
-
+        visited = defaultdict(bool) #create dictionary to ensure all vertices are visited
         for vertex in self.adj_list.keys():
             num_incoming_vert[vertex] #populate the dict
+            visited[vertex]
 
         for vertex in self.adj_list.keys():
             for inc_edge in self.adj_list[vertex]: #iterate through the dependents of a task
@@ -59,8 +62,8 @@ class TaskRunner:
 
             #if all vertices in queue have been visited and if the vertex doesn't have any dependents, pop it from the queue
             if self.adj_list[current_node] == [None] and num_incoming_vert[current_node] == 0:
-                queue.pop(0)
-            else: #if the vert has dependents, cycle through all of them and update the number of incoming verts by 1 bc they have now been visited
+                visited[current_node] = True
+            elif visited[current_node] == False: #if the vert has dependents, cycle through all of them and update the number of incoming verts by 1 bc they have now been visited
                 for vert,weight in self.adj_list[current_node]:
                     for node, in vert: 
                         num_incoming_vert[node[0]] -= 1
@@ -68,9 +71,11 @@ class TaskRunner:
                     if num_incoming_vert[node[0]] == 0: 
                         queue.append(node[0])
 
-                    num_visited += 1
-        
-        if num_visited != len(self.adj_list.keys()): #the number of visited vertices has to be equal to the number of vertices in the task runner for it to be acyclic. 
+                    visited[current_node] = True
+
+        check = len(set(visited.values())) == True
+
+        if check == False: #the number of visited vertices has to be equal to the number of vertices in the task runner for it to be acyclic. 
             return False
         else: 
             sorted_by_time = sorted(time_for_node.items(), key = lambda x:x[1]) #sort the time dict in ASC
@@ -83,7 +88,7 @@ class TaskRunner:
         start_time = time.time() #Time starts now!! 
 
         for node in sorted_tasks: 
-            if round(time.time() - start_time, 1) == node[1]: #check if the time elapsed is equal to the time of the given node
+            if round(time.time() - start_time, 1) >= node[1]: #check if the time elapsed is equal to the time of the given node
                 print(node[0])
             elif round(time.time() - start_time, 1) < node[1]: #if the right amount of time has not been elapsed, wait 
                 time.sleep(node[1] - round(time.time() - start_time, 1))
@@ -120,18 +125,20 @@ def main():
     with open(path, "r") as dag_file: 
         try: 
             dag_dict = json.loads(dag_file.read()) #make sure the input it properly formated in JSON
+            adj_list, root = make_adjacency_list(dag_dict) #make an adjacency list with the input file
+
+            tasks = TaskRunner(adj_list, root)
+            checked_sorted_tasks = tasks.check_acylic_sort() #check if graph is acyclic and make sorted list of tasks
+
+            if checked_sorted_tasks == False:
+                print("Task runner can not execute a list of tasks that has circular dependencies.")
+            else: 
+                tasks.run_tasks(checked_sorted_tasks) #print out the tasks in the appropriate order and time differential
+
         except ValueError as e: 
-            print(f"JSON file is invalid. Please check input. Error:{e}")
+            print(f"JSON file is invalid. Please check input. Error: {e}")
 
-    adj_list, root = make_adjacency_list(dag_dict) #make an adjacency list with the input file
-
-    tasks = TaskRunner(adj_list, root)
-    checked_sorted_tasks = tasks.check_acylic_sort() #check if graph is acyclic and make sorted list of tasks
-
-    if checked_sorted_tasks == False:
-        print("Task runner can not execute a list of tasks that have circular dependencies.")
-    else: 
-        tasks.run_tasks(checked_sorted_tasks) #print out the tasks in the appropriate order and time differential
+    
 
 if __name__ == "__main__":
     main()

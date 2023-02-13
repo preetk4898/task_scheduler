@@ -55,8 +55,6 @@ class TaskRunner:
 
         #start working through the queue to determine if there are any cycles 
 
-        num_visited = 0 #initialize counter to ensure all vertices are visited 
-
         while(queue):
             current_node = queue.pop(0) #FIFO approach 
 
@@ -65,7 +63,7 @@ class TaskRunner:
                 visited[current_node] = True
             elif visited[current_node] == False: #if the vert has dependents, cycle through all of them and update the number of incoming verts by 1 bc they have now been visited
                 for vert,weight in self.adj_list[current_node]:
-                    for node, in vert: 
+                    for node in vert: 
                         num_incoming_vert[node[0]] -= 1
                         time_for_node[node[0]] = time_for_node[current_node] + weight #populate the dict with the time a node will be printed
                     if num_incoming_vert[node[0]] == 0: 
@@ -92,8 +90,6 @@ class TaskRunner:
                 print(node[0])
             elif round(time.time() - start_time, 1) < node[1]: #if the right amount of time has not been elapsed, wait 
                 time.sleep(node[1] - round(time.time() - start_time, 1))
-                print(node[0])
-            else: #if no waiting is required or if the window has been missed, print the node immediately.
                 print(node[0])
             
 

@@ -1,11 +1,6 @@
 '''
 Preet Kaur 
 
-Task Runner 
-Bighat Biosciences Take-Home Assignment
-Pseudocode: 
-https://docs.google.com/document/d/1I88jOjG27xrhnC2wE7hiqMaAuDfoqB4tS8WPLgrdMV4/edit?usp=sharing
-
 How to run: 
 
 python task_runner.py 'path to file'

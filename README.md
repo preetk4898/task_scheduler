@@ -1,7 +1,3 @@
-# bighat_takehome
-Take home technical screen from Bighat Biosciences
-
-
 See task_runner.pdf for detailed specs for the project. 
 
 To run: 
